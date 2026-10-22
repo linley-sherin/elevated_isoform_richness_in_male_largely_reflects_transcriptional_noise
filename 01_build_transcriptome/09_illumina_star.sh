@@ -1,0 +1,97 @@
+#!/bin/bash
+
+## Step 09 (Illumina): STAR index + mapping, for splice junctions and coverage in SQANTI3
+## Last modified by Linley Sherin 2026-10-22
+#
+# Runs locally. SQANTI3 can run STAR itself, but I had issues with it, so this
+# runs STAR separately with the same options SQANTI3 uses.
+#
+# The index is built without an annotation GTF (the STAR manual encourages one,
+# but SQANTI3 doesn't want the splice junctions biased towards any annotation).
+# It uses the NCBI genome, the same one as Iso-Seq mapping (step 06) and SQANTI3,
+# so the chromosome names match (NC_024331.1, ...).
+#
+# Usage (from the project folder; STAR is called directly, no env):
+#   bash 01_build_transcriptome/09_illumina_star.sh
+#
+# Reads:  data/01_build_transcriptome/08_trimmomatic/<sample>_R{1,2}_paired.fastq.gz
+#         data/01_build_transcriptome/reference/ncbi_female.fa
+# Writes: data/01_build_transcriptome/09_star/
+#           STAR_index/                                 genome index
+#           STAR_mapping/<sample>Aligned.sortedByCoord.out.bam
+#           STAR_mapping/<sample>SJ.out.tab             splice junctions
+#           STAR_mapping/<sample>Log.final.out, ...
+#
+# The index is skipped if STAR_index/SA already exists, and a sample is skipped
+# if its SJ.out.tab already exists. Delete them to redo either part.
+
+set -euo pipefail
+
+# Paths are relative to the project root (one folder up from this script)
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+DATA=$ROOT/data/01_build_transcriptome
+IN=$DATA/08_trimmomatic
+GENOME=$DATA/reference/ncbi_female.fa
+OUT=$DATA/09_star
+INDEX=$OUT/STAR_index
+INDEX_THREADS=4     # speed only, does not change results
+MAP_THREADS=40      # speed only, does not change results
+
+[[ -f "$GENOME" ]] || { echo "ERROR: genome $GENOME not found" >&2; exit 1; }
+
+shopt -s nullglob
+r1_files=("$IN"/*_R1_paired.fastq.gz)
+[[ ${#r1_files[@]} -gt 0 ]] || { echo "ERROR: no *_R1_paired.fastq.gz files in $IN. Run step 08 first." >&2; exit 1; }
+
+mkdir -p "$INDEX" "$OUT/STAR_mapping"
+
+## Create a STAR index of the guppy genome
+if [[ -f "$INDEX/SA" ]]; then
+    echo "STAR index already exists, skipping index creation"
+else
+    echo "Building STAR index from $(basename "$GENOME")..."
+    date
+    STAR --runMode genomeGenerate \
+        --genomeDir "$INDEX" \
+        --genomeFastaFiles "$GENOME" \
+        --outTmpDir "$INDEX/STAR_tmp" \
+        --genomeSAindexNbases 13 \
+        --runThreadN "$INDEX_THREADS"
+fi
+
+## Map each sample to the genome
+for r1 in "${r1_files[@]}"; do
+    sample=$(basename "$r1" _R1_paired.fastq.gz)
+    prefix=$OUT/STAR_mapping/$sample
+
+    if [[ -f "${prefix}SJ.out.tab" ]]; then
+        echo "$sample already done, skipping"
+        continue
+    fi
+
+    echo "Mapping: $sample"
+    date
+    STAR --genomeDir "$INDEX" \
+        --readFilesIn "$IN/${sample}_R1_paired.fastq.gz" "$IN/${sample}_R2_paired.fastq.gz" \
+        --readFilesCommand gzcat \
+        --outFileNamePrefix "$prefix" \
+        --alignSJoverhangMin 8 \
+        --alignSJDBoverhangMin 1 \
+        --outFilterType BySJout \
+        --outSAMunmapped Within \
+        --outFilterMultimapNmax 20 \
+        --outFilterMismatchNoverLmax 0.04 \
+        --outFilterMismatchNmax 999 \
+        --alignIntronMin 20 \
+        --alignIntronMax 1000000 \
+        --alignMatesGapMax 1000000 \
+        --sjdbScore 1 \
+        --genomeLoad NoSharedMemory \
+        --outSAMtype BAM SortedByCoordinate \
+        --twopassMode Basic \
+        --runThreadN "$MAP_THREADS"
+    echo "Finished mapping $sample"
+done
+
+echo "Completed STAR mapping."
+date
