@@ -17,7 +17,7 @@
 #         data/01_build_transcriptome/reference/IsoSeq_v2_primers_12.fasta
 # Writes: data/01_build_transcriptome/02_lima/cellN/
 #           output.IsoSeqX_bcNN_5p--IsoSeqX_3p.bam   one BAM per barcode
-#           output.unbarcoded.bam, output.lima.*     removed reads and reports
+#           output.lima.*                            reports (unbarcoded reads are not kept)
 #           cellN_lima.log
 #
 # A cell is skipped if output.lima.summary already exists (lima writes it
@@ -61,7 +61,6 @@ for bam in "${segmented_bams[@]}"; do
         --isoseq \
         --peek-guess \
         --overwrite-biosample-names \
-        --dump-removed \
         -j "$THREADS" \
         --log-level INFO --log-file "$cell_out/${cell}_lima.log"
     echo "Processing for $cell is finished."
