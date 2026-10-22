@@ -5,12 +5,12 @@
 #
 # Usage (on the cluster, from the project folder):
 #   conda activate pacbio
-#   bash 01_build_transcriptome/06_isoseq_mapcollapse.sh
+#   bash 01_build_longread_transcriptome/06_isoseq_mapcollapse.sh
 #
-# Reads:  data/01_build_transcriptome/05_cluster/clustered.bam
-#         data/01_build_transcriptome/04_updatebam/flnc.fofn (and the BAMs it lists)
-#         data/01_build_transcriptome/reference/ncbi_female.fa
-# Writes: data/01_build_transcriptome/06_mapcollapse/
+# Reads:  data/01_build_longread_transcriptome/05_cluster/clustered.bam
+#         data/01_build_longread_transcriptome/04_updatebam/flnc.fofn (and the BAMs it lists)
+#         data/01_build_longread_transcriptome/reference/ncbi_female.fa
+# Writes: data/01_build_longread_transcriptome/06_mapcollapse/
 #           mapped.bam, mapped.log
 #           collapsed.gff, collapsed.fasta, collapsed.abundance.txt, ...
 #           collapse.log
@@ -22,7 +22,7 @@ set -euo pipefail
 
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-DATA=$ROOT/data/01_build_transcriptome
+DATA=$ROOT/data/01_build_longread_transcriptome
 GENOME=$DATA/reference/ncbi_female.fa
 CLUSTERED=$DATA/05_cluster/clustered.bam
 FOFN=$DATA/04_updatebam/flnc.fofn

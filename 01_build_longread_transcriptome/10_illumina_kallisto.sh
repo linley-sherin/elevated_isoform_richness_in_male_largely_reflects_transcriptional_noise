@@ -7,11 +7,11 @@
 #
 # Usage (from the project folder):
 #   conda activate kallisto_env
-#   bash 01_build_transcriptome/10_illumina_kallisto.sh
+#   bash 01_build_longread_transcriptome/10_illumina_kallisto.sh
 #
-# Reads:  data/01_build_transcriptome/08_trimmomatic/<sample>_R{1,2}_paired.fastq.gz
-#         data/01_build_transcriptome/06_mapcollapse/collapsed.fasta
-# Writes: data/01_build_transcriptome/10_kallisto/
+# Reads:  data/01_build_longread_transcriptome/08_trimmomatic/<sample>_R{1,2}_paired.fastq.gz
+#         data/01_build_longread_transcriptome/06_mapcollapse/collapsed.fasta
+# Writes: data/01_build_longread_transcriptome/10_kallisto/
 #           kallisto_collapsed.idx
 #           <sample>/abundance.tsv, abundance.h5, run_info.json
 #
@@ -22,7 +22,7 @@ set -euo pipefail
 
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-DATA=$ROOT/data/01_build_transcriptome
+DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/08_trimmomatic
 TRANSCRIPTS=$DATA/06_mapcollapse/collapsed.fasta
 OUT=$DATA/10_kallisto

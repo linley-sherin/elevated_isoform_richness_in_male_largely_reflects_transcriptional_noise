@@ -12,11 +12,11 @@
 # so the chromosome names match (NC_024331.1, ...).
 #
 # Usage (from the project folder; STAR is called directly, no env):
-#   bash 01_build_transcriptome/09_illumina_star.sh
+#   bash 01_build_longread_transcriptome/09_illumina_star.sh
 #
-# Reads:  data/01_build_transcriptome/08_trimmomatic/<sample>_R{1,2}_paired.fastq.gz
-#         data/01_build_transcriptome/reference/ncbi_female.fa
-# Writes: data/01_build_transcriptome/09_star/
+# Reads:  data/01_build_longread_transcriptome/08_trimmomatic/<sample>_R{1,2}_paired.fastq.gz
+#         data/01_build_longread_transcriptome/reference/ncbi_female.fa
+# Writes: data/01_build_longread_transcriptome/09_star/
 #           STAR_index/                                 genome index
 #           STAR_mapping/<sample>Aligned.sortedByCoord.out.bam
 #           STAR_mapping/<sample>SJ.out.tab             splice junctions
@@ -29,7 +29,7 @@ set -euo pipefail
 
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-DATA=$ROOT/data/01_build_transcriptome
+DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/08_trimmomatic
 GENOME=$DATA/reference/ncbi_female.fa
 OUT=$DATA/09_star

@@ -9,12 +9,12 @@
 #
 # Usage (on the cluster, from the project folder):
 #   conda activate pacbio
-#   bash 01_build_transcriptome/01_isoseq_skera.sh
+#   bash 01_build_longread_transcriptome/01_isoseq_skera.sh
 #
-# Reads:  data/01_build_transcriptome/00_hifireads/*.hifi_reads.bcM000N.bam
+# Reads:  data/01_build_longread_transcriptome/00_hifireads/*.hifi_reads.bcM000N.bam
 #           (one per SMRT cell; bcM000N = cell/pool N)
-#         data/01_build_transcriptome/reference/mas8_primers.fasta
-# Writes: data/01_build_transcriptome/01_skera/
+#         data/01_build_longread_transcriptome/reference/mas8_primers.fasta
+# Writes: data/01_build_longread_transcriptome/01_skera/
 #           segmented_cellN.bam      S-reads, input to step 02
 #           segmented_cellN.*        skera's other outputs (non_passing, summary)
 #           segmented_cellN.log
@@ -26,7 +26,7 @@ set -euo pipefail
 
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-DATA=$ROOT/data/01_build_transcriptome
+DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/00_hifireads
 OUT=$DATA/01_skera
 ADAPTERS=$DATA/reference/mas8_primers.fasta   # Kinnex full-length RNA, 8-mer arrays (MAS-Seq_Adapter_v3)

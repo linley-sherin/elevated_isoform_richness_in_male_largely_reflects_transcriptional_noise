@@ -5,10 +5,10 @@
 #
 # Usage (on the cluster, from the project folder):
 #   conda activate pacbio
-#   bash 01_build_transcriptome/05_isoseq_cluster.sh
+#   bash 01_build_longread_transcriptome/05_isoseq_cluster.sh
 #
-# Reads:  data/01_build_transcriptome/04_updatebam/flnc.fofn (and the BAMs it lists)
-# Writes: data/01_build_transcriptome/05_cluster/
+# Reads:  data/01_build_longread_transcriptome/04_updatebam/flnc.fofn (and the BAMs it lists)
+# Writes: data/01_build_longread_transcriptome/05_cluster/
 #           clustered.bam             input to step 06
 #           clustered.cluster_report.csv
 #           cluster.log
@@ -19,7 +19,7 @@ set -euo pipefail
 
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-DATA=$ROOT/data/01_build_transcriptome
+DATA=$ROOT/data/01_build_longread_transcriptome
 FOFN=$DATA/04_updatebam/flnc.fofn
 OUT=$DATA/05_cluster
 THREADS=48          # speed only, does not change results

@@ -8,15 +8,15 @@
 # step sets SM to the real sample ID, using updatebam.csv:
 #   input_bam,output_bam,new_sample_name
 #   03_refine/cell1/flnc_IsoSeqX_bc01_5p--IsoSeqX_3p.bam,04_updatebam/flnc_3FGP.bam,3FGP
-# (paths relative to data/01_build_transcriptome/)
+# (paths relative to data/01_build_longread_transcriptome/)
 #
 # Usage (on the cluster, from the project folder):
 #   conda activate pacbio
-#   bash 01_build_transcriptome/04_isoseq_updatebam.sh
+#   bash 01_build_longread_transcriptome/04_isoseq_updatebam.sh
 #
-# Reads:  data/01_build_transcriptome/updatebam.csv
-#         data/01_build_transcriptome/03_refine/cellN/flnc_*.bam
-# Writes: data/01_build_transcriptome/04_updatebam/
+# Reads:  data/01_build_longread_transcriptome/updatebam.csv
+#         data/01_build_longread_transcriptome/03_refine/cellN/flnc_*.bam
+# Writes: data/01_build_longread_transcriptome/04_updatebam/
 #           flnc_<sample>.bam, flnc_<sample>.bam.pbi
 #           flnc.fofn                 list of all sample BAMs, input to steps 05 and 06
 #
@@ -26,7 +26,7 @@ set -euo pipefail
 
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-DATA=$ROOT/data/01_build_transcriptome
+DATA=$ROOT/data/01_build_longread_transcriptome
 CSV=$DATA/updatebam.csv
 OUT=$DATA/04_updatebam
 

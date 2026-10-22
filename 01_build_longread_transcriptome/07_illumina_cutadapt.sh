@@ -7,11 +7,11 @@
 #
 # Usage (from the project folder):
 #   conda activate cutadapt
-#   bash 01_build_transcriptome/07_illumina_cutadapt.sh
+#   bash 01_build_longread_transcriptome/07_illumina_cutadapt.sh
 # (MultiQC runs from its own env, multiqc_env)
 #
-# Reads:  data/01_build_transcriptome/00_rawillumina/<sample>_R{1,2}.fastq.gz
-# Writes: data/01_build_transcriptome/07_cutadapt/
+# Reads:  data/01_build_longread_transcriptome/00_rawillumina/<sample>_R{1,2}.fastq.gz
+# Writes: data/01_build_longread_transcriptome/07_cutadapt/
 #           <sample>_R{1,2}.fastq.gz   trimmed reads, input to step 08
 #           fastqc/                    FastQC reports + multiqc_report.html
 #
@@ -22,7 +22,7 @@ set -euo pipefail
 
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-DATA=$ROOT/data/01_build_transcriptome
+DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/00_rawillumina
 OUT=$DATA/07_cutadapt
 

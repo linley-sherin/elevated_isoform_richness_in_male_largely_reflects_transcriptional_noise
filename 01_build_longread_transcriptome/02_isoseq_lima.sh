@@ -11,11 +11,11 @@
 #
 # Usage (on the cluster, from the project folder):
 #   conda activate pacbio
-#   bash 01_build_transcriptome/02_isoseq_lima.sh
+#   bash 01_build_longread_transcriptome/02_isoseq_lima.sh
 #
-# Reads:  data/01_build_transcriptome/01_skera/segmented_cellN.bam
-#         data/01_build_transcriptome/reference/IsoSeq_v2_primers_12.fasta
-# Writes: data/01_build_transcriptome/02_lima/cellN/
+# Reads:  data/01_build_longread_transcriptome/01_skera/segmented_cellN.bam
+#         data/01_build_longread_transcriptome/reference/IsoSeq_v2_primers_12.fasta
+# Writes: data/01_build_longread_transcriptome/02_lima/cellN/
 #           output.IsoSeqX_bcNN_5p--IsoSeqX_3p.bam   one BAM per barcode
 #           output.lima.*                            reports (unbarcoded reads are not kept)
 #           cellN_lima.log
@@ -27,7 +27,7 @@ set -euo pipefail
 
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-DATA=$ROOT/data/01_build_transcriptome
+DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/01_skera
 OUT=$DATA/02_lima
 PRIMERS=$DATA/reference/IsoSeq_v2_primers_12.fasta   # IsoSeqX bc01-12 5' primers + 3' primer

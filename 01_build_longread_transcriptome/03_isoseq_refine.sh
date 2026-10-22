@@ -9,11 +9,11 @@
 #
 # Usage (on the cluster, from the project folder):
 #   conda activate pacbio
-#   bash 01_build_transcriptome/03_isoseq_refine.sh
+#   bash 01_build_longread_transcriptome/03_isoseq_refine.sh
 #
-# Reads:  data/01_build_transcriptome/02_lima/cellN/output.IsoSeqX_bcNN_5p--IsoSeqX_3p.bam
-#         data/01_build_transcriptome/reference/IsoSeq_v2_primers_12.fasta
-# Writes: data/01_build_transcriptome/03_refine/cellN/
+# Reads:  data/01_build_longread_transcriptome/02_lima/cellN/output.IsoSeqX_bcNN_5p--IsoSeqX_3p.bam
+#         data/01_build_longread_transcriptome/reference/IsoSeq_v2_primers_12.fasta
+# Writes: data/01_build_longread_transcriptome/03_refine/cellN/
 #           flnc_IsoSeqX_bcNN_5p--IsoSeqX_3p.bam     FLNC reads, input to step 04
 #           flnc_*.report.csv, flnc_*.filter_summary.report.json
 #           flnc_*_refine.log
@@ -25,7 +25,7 @@ set -euo pipefail
 
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-DATA=$ROOT/data/01_build_transcriptome
+DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/02_lima
 OUT=$DATA/03_refine
 PRIMERS=$DATA/reference/IsoSeq_v2_primers_12.fasta
