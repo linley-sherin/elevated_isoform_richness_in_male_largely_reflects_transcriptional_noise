@@ -20,3 +20,12 @@
 
 # ...and this file
 !.gitignore
+
+# Folders to leave out completely
+data/
+sequencing_forms/
+sampling/
+NCBI_sub/
+manuscript/
+**/tools/
+**/extras/
