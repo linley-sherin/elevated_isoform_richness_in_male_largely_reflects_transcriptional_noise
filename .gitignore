@@ -1,0 +1,22 @@
+# Ignore everything...
+*
+
+# ...except folders (so git can look inside them)
+!*/
+
+# ...and these file types
+# scripts
+!*.sh
+!*.R
+# figures
+!*.png
+!*.jpeg
+!*.jpg
+!*.pdf
+# text and data frames
+!*.txt
+!*.csv
+!*.tsv
+
+# ...and this file
+!.gitignore
