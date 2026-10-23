@@ -52,6 +52,7 @@ cat("Stringtie GTF contains", length(unique(stringtie_df_filtered$transcript_id)
 
 sj_supported <- read.csv(here::here("data",
                                     "01_build_longread_transcriptome",
+                                    "14_remove_redundancy",
                                     "junction_whitelist.csv"))
 
 ################################################################################

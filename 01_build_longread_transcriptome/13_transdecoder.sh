@@ -1,67 +1,93 @@
 #!/bin/bash
 
-set -euo pipefail
-mkdir -p ./08_transdecoder2
+## Step 13: ORF prediction with TD2 on the SQANTI-filtered isoforms, then best ORF per transcript
+## Last modified by Linley Sherin 2026-10-23
+#
+# Runs locally.
+# (1) Transcript FASTA + GFF3 from the SQANTI-filtered GTF (TransDecoder utils)
+# (2) TD2.LongOrfs + TD2.Predict (-P 0.9)
+# (3) ORFs mapped back to genome coordinates (transcripts_with_cds.gff3)
+# (4) Best ORF per transcript (lib/parse_td2.R)
+#
+# Usage (from the project folder):
+#   conda activate transdecoder_env
+#   bash 01_build_longread_transcriptome/13_transdecoder.sh
+#
+# Reads:  data/GTF/02_SQANTI_filtered.gtf
+#         data/reference/ncbi_female.fa
+#         tools/TransDecoder-v5.7.1/util/
+# Writes: data/01_build_longread_transcriptome/13_transdecoder/
+#           transcripts.fasta, transcripts.gff3
+#           transcripts.fasta.TD2.*, longest_orfs.*
+#           transcripts_with_cds.gff3
+#           parsed_results.csv          best ORF per transcript, input to step 14
+#           transdecoder2_<date>.log
+#
+# TD2 (1-3) is skipped if transcripts_with_cds.gff3 already exists, and (4) if
+# parsed_results.csv already exists. Delete them to redo either part.
 
-# === Use TD2 utility scripts to try and fix issue with strand mismatches  === #
+set -euo pipefail
+
+# Paths are relative to the project root (one folder up from this script)
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+GTF=$ROOT/data/GTF/02_SQANTI_filtered.gtf
+GENOME=$ROOT/data/reference/ncbi_female.fa
+TD_UTIL=$ROOT/tools/TransDecoder-v5.7.1/util
+OUT=$ROOT/data/01_build_longread_transcriptome/13_transdecoder
+RSCRIPT=/usr/local/bin/Rscript      # system R (transdecoder_env has its own R without the packages)
 
 export PATH=/Library/Frameworks/Python.framework/Versions/3.11/bin/TD2/util:$PATH
 
-# Convert transcriptome to fasta directly from genomic coordinates
-tools/TransDecoder-v5.7.1/util/gtf_genome_to_cdna_fasta.pl data/GTF/02_SQANTI_filtered.gtf data/reference/ncbi_female.fa > ./08_transdecoder2/transcripts.fasta
-# Convert gtf to gff3 
-tools/TransDecoder-v5.7.1/util/gtf_to_alignment_gff3.pl data/GTF/02_SQANTI_filtered.gtf > ./08_transdecoder2/transcripts.gff3
+[[ -f "$GTF" ]] || { echo "ERROR: $GTF not found. Run step 12 first." >&2; exit 1; }
+[[ -f "$GENOME" ]] || { echo "ERROR: genome $GENOME not found" >&2; exit 1; }
 
-# === Setup logging ===
-LOGFILE="./08_transdecoder2/transdecoder2_$(date +%Y%m%d_%H%M%S).log"
-exec > >(tee -i "$LOGFILE")
-exec 2>&1
+mkdir -p "$OUT"
 
-# === Create output directory and enter it ===
-mkdir -p ./08_transdecoder2
-cd ./08_transdecoder2
-
-# === Inputs and settings ===
-FASTA="../08_transdecoder2/transcripts.fasta"
-BASENAME=$(basename "$FASTA" .fasta)
-
-echo "Starting TransDecoder analysis at $(date)"
-echo "Input FASTA: $FASTA"
-echo "Output directory: $(pwd)"
-echo "Log file: $LOGFILE"
-
-# === Run TD2.LongOrfs (no --precise this time) ===
-if [[ -d "$BASENAME" ]]; then
-    echo "TD2.LongOrfs output directory '$BASENAME' already exists. Skipping."
+if [[ -f "$OUT/transcripts_with_cds.gff3" ]]; then
+    echo "transcripts_with_cds.gff3 already exists, skipping TD2"
 else
-    echo "Running TD2.LongOrfs (relaxed)..."
-    TD2.LongOrfs -t "$FASTA" \
-    			 -v \
-    			 -S
+    # === Setup logging ===
+    LOGFILE="$OUT/transdecoder2_$(date +%Y%m%d_%H%M%S).log"
+    exec > >(tee -i "$LOGFILE") 2>&1
+    echo "Starting TransDecoder analysis at $(date)"
+
+    # (1) Transcript FASTA directly from genomic coordinates, and GTF -> GFF3
+    "$TD_UTIL/gtf_genome_to_cdna_fasta.pl" "$GTF" "$GENOME" > "$OUT/transcripts.fasta"
+    "$TD_UTIL/gtf_to_alignment_gff3.pl" "$GTF" > "$OUT/transcripts.gff3"
+
+    # (2) TD2 runs inside the output folder
+    cd "$OUT"
+    if [[ -d transcripts ]]; then
+        echo "TD2.LongOrfs output folder 'transcripts' already exists, skipping"
+    else
+        echo "Running TD2.LongOrfs (relaxed)..."
+        TD2.LongOrfs -t transcripts.fasta -v -S
+    fi
+
+    echo "Running TD2.Predict..."
+    TD2.Predict -t transcripts.fasta -v -O ./transcripts -P 0.9
+
+    echo "Moving final output files up one level..."
+    mv transcripts/* ./
+    rmdir transcripts
+    cd "$ROOT"
+
+    # (3) Map ORFs back to the genome (fixes strand mismatches)
+    "$TD_UTIL/cdna_alignment_orf_to_genome_orf.pl" \
+        "$OUT/transcripts.fasta.TD2.gff3" \
+        "$OUT/transcripts.gff3" \
+        "$OUT/transcripts.fasta" > "$OUT/transcripts_with_cds.gff3"
+
+    echo "TransDecoder finished at $(date)"
 fi
 
-# === Run TD2.Predict (less conservative) ===
-echo "Running TD2.Predict..."
+# (4) Best ORF per transcript
+if [[ -f "$OUT/parsed_results.csv" ]]; then
+    echo "parsed_results.csv already exists, skipping parse"
+else
+    echo "Parsing TD2 results..."
+    "$RSCRIPT" "$ROOT/01_build_longread_transcriptome/lib/parse_td2.R"
+fi
 
-TD2.Predict -t "$FASTA" \
-            -v \
-            -O "./$BASENAME" \
-            #--all-good \
-            -P 0.9
-
-# === Finalize output ===
-echo "Moving final output files up one level..."
-mv "$BASENAME"/* ./
-rmdir "$BASENAME"
-
-# === Use TD2 utility scripts to try and fix issue with strand mismatches  === #
-# Create gff3 output with cds regions already annotated
-
-tools/TransDecoder-v5.7.1/util/cdna_alignment_orf_to_genome_orf.pl \
-     ../08_transdecoder2/transcripts.fasta.TD2.gff3 \
-     ../08_transdecoder2/transcripts.gff3 \
-     ../08_transdecoder2/transcripts.fasta > transcripts_with_cds.gff3
-
-echo "TransDecoder finished at $(date)"
-echo "Final files:"
-ls -lh ./
+echo "Step 13 is finished :)"
+date

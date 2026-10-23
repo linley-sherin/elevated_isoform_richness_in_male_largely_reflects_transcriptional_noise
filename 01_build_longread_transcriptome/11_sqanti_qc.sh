@@ -26,6 +26,7 @@
 #           STAR_bams.fofn                list of STAR BAMs for SQANTI3
 #           output/SQANTI_output_*        classification, junctions, corrected GTF, report
 #           output/sqanti_terminal.log
+#         data/GTF/01_SQANTI_output.gtf  copy of output/SQANTI_output_corrected.gtf
 #
 # Skipped if output/SQANTI_output_classification.txt already exists. Delete
 # output/ to redo it.
@@ -88,6 +89,8 @@ apptainer run /Linux/containers/sqanti3.sif sqanti3_qc.py \
     --cpus "$CPUS" \
     --chunks "$CHUNKS" \
     --report both > "$OUT/output/sqanti_terminal.log" 2>&1
+
+cp "$OUT/output/SQANTI_output_corrected.gtf" "$ROOT/data/GTF/01_SQANTI_output.gtf"
 
 echo "SQANTI3 QC is finished :)"
 date

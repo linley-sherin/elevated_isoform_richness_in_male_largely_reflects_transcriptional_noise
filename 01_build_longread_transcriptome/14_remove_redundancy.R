@@ -51,8 +51,8 @@ transcripts <- gtf_sqanti[gtf_sqanti$type == "transcript", ]
 
 # Read junction object using data.table (much faster for large SQANTI files)
 junc <- data.table::fread(here::here("data",
-                                     "isoseq",
-                                     "06_SQANTIqc",
+                                     "01_build_longread_transcriptome",
+                                     "11_sqanti_qc",
                                      "output",
                                      "SQANTI_output_junctions.txt"),
                           header = TRUE, 
@@ -64,8 +64,8 @@ junc_sqanti <- junc[junc$isoform %in% transcripts$transcript_id, ]
 
 # Read expression data (FL transcripts from PacBio workflow)
 fl_df <- data.table::fread(here::here("data",
-                                "isoseq",
-                                "05_mapcollapse",
+                                "01_build_longread_transcriptome",
+                                "06_mapcollapse",
                                 "collapsed.abundance.txt"),
                      header = T,
                      skip = 4) %>%
@@ -73,8 +73,8 @@ fl_df <- data.table::fread(here::here("data",
 
 # Read in orf data
 orf_df <- read.csv(here::here("data",
-                              "isoseq",
-                              "08_transdecoder2",
+                              "01_build_longread_transcriptome",
+                              "13_transdecoder",
                               "parsed_results.csv"))
 
 ################################################################################
@@ -147,7 +147,8 @@ sj_supported <- sj_tidy %>% filter(supported)
 # Save
 write_csv(sj_supported,
           here::here("data",
-                     "isoseq",
+                     "01_build_longread_transcriptome",
+                     "14_remove_redundancy",
                      "junction_whitelist.csv"))
 
 # Create a vector of supported junctions as chr-start-end strings
@@ -681,8 +682,8 @@ orf_df_passed <- orf_df %>%
 
 # Load sqanti results with reference name
 asso_gene <- read.delim2(here::here("data",
-                                 "isoseq",
-                                 "07_SQANTIfilter",
+                                 "01_build_longread_transcriptome",
+                                 "12_sqanti_filter",
                                  "SQANTI_filtered_RulesFilter_result_classification.txt")) %>%
   filter(filter_result == "Isoform") %>%
   dplyr::select(associated_gene, isoform)
@@ -879,6 +880,11 @@ write.table(
   col.names = FALSE
 )
 
+# Keep a copy in this step's folder too
+file.copy(here::here("data", "GTF", "03_nonredundant_transcriptome.gtf"),
+          here::here("data", "01_build_longread_transcriptome", "14_remove_redundancy", "03_nonredundant_transcriptome.gtf"),
+          overwrite = TRUE)
+
 # Print a summary
 cat("Non-redundant gtf save with", length(unique(gtf_final2$new_gene_id)), "unique genes.\n")
 cat("Non-redundant gtf save with", length(unique(gtf_final2$new_transcript_id)), "unique transcripts.\n")
@@ -888,8 +894,8 @@ cat("Non-redundant gtf save with", length(unique(gtf_final2$new_transcript_id)),
 ################################################################################
 
 fasta <- readDNAStringSet(here::here("data",
-                                     "isoseq",
-                                     "07_SQANTIfilter",
+                                     "01_build_longread_transcriptome",
+                                     "12_sqanti_filter",
                                      "SQANTI_filtered.filtered.fasta"))
 
 # Remove sequences that are in log_removed
@@ -911,8 +917,8 @@ names(fasta_final) <- name_map[names(fasta_final)]
 
 # Save
 writeXStringSet(fasta_final, filepath = here::here("data",
-                                                      "isoseq",
-                                                      "07_SQANTIfilter",
+                                                      "01_build_longread_transcriptome",
+                                                      "14_remove_redundancy",
                                                       "nonredundant_transcripts.fasta"))
 
 # Save map 'rosetta stone'
@@ -925,7 +931,8 @@ id_mapping_table <- gtf_final2 %>%
 write.csv(
   id_mapping_table, 
   file = here::here("data",
-                    "isoseq",
+                    "01_build_longread_transcriptome",
+                    "14_remove_redundancy",
                     "rosetta_stone.csv"),
   row.names = FALSE
 )

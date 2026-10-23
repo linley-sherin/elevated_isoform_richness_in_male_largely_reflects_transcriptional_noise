@@ -1084,26 +1084,26 @@ rtracklayer::export(
 #                      "isoseq",
 #                      "14_shortreadpipe",
 #                      "04_edgeR",
-#                      "01_gonadtran_countmatrix_long.csv"))
+#                      "01_gonadtran_countmatrix.csv"))
 # write.csv(tran_matrix_CPMgonad,
 #           here::here("data",
 #                      "isoseq",
 #                      "14_shortreadpipe",
 #                      "04_edgeR",
-#                      "01_gonadtran_TMMTPMmatrix_long.csv"),
+#                      "01_gonadtran_TMMTPMmatrix.csv"),
 #           row.names = F)
 # write.csv(tran_matrix_tail, 
 #           here::here("data",
 #                      "isoseq",
 #                      "14_shortreadpipe",
 #                      "04_edgeR",
-#                      "02_tailtran_countmatrix_long.csv"))
+#                      "02_tailtran_countmatrix.csv"))
 # write.csv(tran_matrix_CPMtail,
 #           here::here("data",
 #                      "isoseq",
 #                      "14_shortreadpipe",
 #                      "04_edgeR",
-#                      "02_tailtran_TMMTPMmatrix_long.csv"))
+#                      "02_tailtran_TMMTPMmatrix.csv"))
 # 
 # # Plot MDS (this will automatically do a log cpm transform)
 # plotMDS(dge_gene_gonad,
@@ -1319,22 +1319,22 @@ rtracklayer::export(
 #                                        "isoseq",
 #                                        "14_shortreadpipe",
 #                                        "04_edgeR",
-#                                        "01_eR_genegonad_long.RData"))
+#                                        "01_eR_genegonad.RData"))
 # save(dge_gene_tail, file = here::here("data",
 #                                       "isoseq",
 #                                       "14_shortreadpipe",
 #                                       "04_edgeR",
-#                                       "02_eR_genetail_long.RData"))
+#                                       "02_eR_genetail.RData"))
 # save(dge_tran_gonad, file = here::here("data",
 #                                        "isoseq",
 #                                        "14_shortreadpipe",
 #                                        "04_edgeR",
-#                                        "01_eR_trangonad_long.RData"))
+#                                        "01_eR_trangonad.RData"))
 # save(dge_tran_tail, file = here::here("data",
 #                                       "isoseq",
 #                                       "14_shortreadpipe",
 #                                       "04_edgeR",
-#                                       "02_eR_trantail_long.RData"))
+#                                       "02_eR_trantail.RData"))
 # 
 # ################################################################################
 # ### (3) Filter over files by filter outputs

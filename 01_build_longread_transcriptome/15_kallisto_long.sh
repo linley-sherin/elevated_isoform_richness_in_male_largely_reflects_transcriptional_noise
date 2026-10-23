@@ -15,7 +15,7 @@
 #   conda activate kallisto_env
 #   bash 01_build_longread_transcriptome/15_kallisto_long.sh
 #
-# Reads:  data/01_build_longread_transcriptome/12_sqanti_filter/nonredundant_transcripts.fasta (from step 14)
+# Reads:  data/01_build_longread_transcriptome/14_remove_redundancy/nonredundant_transcripts.fasta
 #         data/01_build_longread_transcriptome/04_updatebam/flnc_<sample>.bam (or .fastq)
 #         tools/kallisto/kallisto_mac-v0.51.1_kmer64
 # Writes: data/01_build_longread_transcriptome/04_updatebam/flnc_<sample>.fastq (if missing)
@@ -32,7 +32,7 @@ set -euo pipefail
 # Paths are relative to the project root (one folder up from this script)
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DATA=$ROOT/data/01_build_longread_transcriptome
-FASTA=$DATA/12_sqanti_filter/nonredundant_transcripts.fasta
+FASTA=$DATA/14_remove_redundancy/nonredundant_transcripts.fasta
 FLNC=$DATA/04_updatebam
 KALLISTO=$ROOT/tools/kallisto/kallisto_mac-v0.51.1_kmer64
 OUT=$DATA/15_kallisto

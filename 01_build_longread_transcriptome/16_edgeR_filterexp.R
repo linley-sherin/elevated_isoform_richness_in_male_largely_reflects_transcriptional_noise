@@ -35,8 +35,8 @@ library(ggpointdensity)
 
 # List parent directory
 base_dir <- here::here("data",
-                       "isoseq",
-                       "09_kallisto",
+                       "01_build_longread_transcriptome",
+                       "15_kallisto",
                        "kallisto_long")
 
 # Get all sample directory names
@@ -51,7 +51,7 @@ abundance_dirs <- file.path(sample_dirs,
 # Also load metadata for batch effects
 # Contains: cell, sample_id, sex, tissue, selection, read depth (from flnc.bam)
 metadata <- read.csv(here::here("data",
-                                "isoseq",
+                                "01_build_longread_transcriptome",
                                 "metadata.csv"))
 
 # Read in the data using catchKallisto
@@ -88,9 +88,9 @@ dispersion_df <- data.frame(
 # Save
 write.csv(dispersion_df,
           here::here("data",
-                     "isoseq",
-                     "10_edgeR_filterexp",
-                     "dispersion_output_long.csv"))
+                     "01_build_longread_transcriptome",
+                     "16_edgeR_filterexp",
+                     "dispersion_output.csv"))
 
 ### Create metadata
 
@@ -338,25 +338,25 @@ tran_matrix_TPMtail$gene <- sub("\\.[^.]+$", "", tran_matrix_TPMtail$transcript)
 # Save
 write.csv(tran_matrix_gonad, 
           here::here("data",
-                     "isoseq",
-                     "10_edgeR_filterexp",
-                     "01_gonadtran_countmatrix_long.csv"))
+                     "01_build_longread_transcriptome",
+                     "16_edgeR_filterexp",
+                     "01_gonadtran_countmatrix.csv"))
 write.csv(tran_matrix_TPMgonad,
           here::here("data",
-                     "isoseq",
-                     "10_edgeR_filterexp",
-                     "01_gonadtran_TMMTPMmatrix_long.csv"),
+                     "01_build_longread_transcriptome",
+                     "16_edgeR_filterexp",
+                     "01_gonadtran_TMMTPMmatrix.csv"),
           row.names = F)
 write.csv(tran_matrix_tail, 
           here::here("data",
-                     "isoseq",
-                     "10_edgeR_filterexp",
-                     "02_tailtran_countmatrix_long.csv"))
+                     "01_build_longread_transcriptome",
+                     "16_edgeR_filterexp",
+                     "02_tailtran_countmatrix.csv"))
 write.csv(tran_matrix_TPMtail,
           here::here("data",
-                     "isoseq",
-                     "10_edgeR_filterexp",
-                     "02_tailtran_TMMTPMmatrix_long.csv"))
+                     "01_build_longread_transcriptome",
+                     "16_edgeR_filterexp",
+                     "02_tailtran_TMMTPMmatrix.csv"))
 
 # Plot MDS (this will automatically do a log TPM transform)
 plotMDS(dge_gene_gonad,
@@ -389,21 +389,21 @@ dim(dge_tran_tail)
 
 # Save edgeR objects to a _long.RData file
 save(dge_gene_gonad, file = here::here("data",
-                                       "isoseq",
-                                       "10_edgeR_filterexp",
-                                       "01_eR_genegonad_long.RData"))
+                                       "01_build_longread_transcriptome",
+                                       "16_edgeR_filterexp",
+                                       "01_eR_genegonad.RData"))
 save(dge_gene_tail, file = here::here("data",
-                                       "isoseq",
-                                       "10_edgeR_filterexp",
-                                       "02_eR_genetail_long.RData"))
+                                       "01_build_longread_transcriptome",
+                                       "16_edgeR_filterexp",
+                                       "02_eR_genetail.RData"))
 save(dge_tran_gonad, file = here::here("data",
-                                       "isoseq",
-                                       "10_edgeR_filterexp",
-                                       "01_eR_trangonad_long.RData"))
+                                       "01_build_longread_transcriptome",
+                                       "16_edgeR_filterexp",
+                                       "01_eR_trangonad.RData"))
 save(dge_tran_tail, file = here::here("data",
-                                       "isoseq",
-                                       "10_edgeR_filterexp",
-                                       "02_eR_trantail_long.RData"))
+                                       "01_build_longread_transcriptome",
+                                       "16_edgeR_filterexp",
+                                       "02_eR_trantail.RData"))
 
 ################################################################################
 ### (5) Filter over files by filter outputs
@@ -417,15 +417,16 @@ keep_transcripts_union <- unique(c(
 
 # Classification.txt output from SQANTI filter
 class <- read.delim2(here::here("data",
-                                "isoseq",
-                                "07_SQANTIfilter",
+                                "01_build_longread_transcriptome",
+                                "12_sqanti_filter",
                                 "SQANTI_filtered_RulesFilter_result_classification.txt"),
                   header = T)
 class <- class[class$filter_result == "Isoform", ] # Filter out isoforms that failed SQANTI filter
 
 # Read in gene reassignment map to adjust files
 map <- read.csv(here::here("data",
-                           "isoseq",
+                           "01_build_longread_transcriptome",
+                           "14_remove_redundancy",
                            "rosetta_stone.csv"))
 
 # Merge on transcript_id (same as class$isoform)
@@ -452,9 +453,9 @@ class <- class %>%
 # Save class
 write.csv(class,
           here::here("data",
-                     "isoseq",
-                     "10_edgeR_filterexp",
-                     "SQANTI_classification_filtered_long.csv"),
+                     "01_build_longread_transcriptome",
+                     "16_edgeR_filterexp",
+                     "SQANTI_classification_filtered.csv"),
           row.names = F)
 
 # # GTF output from redundancy script
@@ -473,6 +474,11 @@ rtracklayer::export(
        "04_filtered_by_exp_long.gtf"),
   format = "gtf"
 )
+
+# Keep a copy in this step's folder too
+file.copy(here::here("data", "GTF", "04_filtered_by_exp_long.gtf"),
+          here::here("data", "01_build_longread_transcriptome", "16_edgeR_filterexp", "04_filtered_by_exp_long.gtf"),
+          overwrite = TRUE)
 
 # Summary
 cat("Number of genes after filtering:", length(unique(gtf_filtered$gene_id)), "\n")

@@ -8,8 +8,8 @@ library(dplyr)
 
 # Load gff file output from TD2 - these are all of the orfs that have strands matching the original genomic coordinates
 gff <- read.delim(here::here("data",
-                             "isoseq",
-                             "08_transdecoder2",
+                             "01_build_longread_transcriptome",
+                             "13_transdecoder",
                              "transcripts_with_cds.gff3"), 
                   header = FALSE, 
                   comment.char = "#", 
@@ -30,8 +30,8 @@ gff_parsed <- gff %>%
 
 # Load cds file output from TD2
 cds <- readDNAStringSet(here::here("data",
-                                   "isoseq",
-                                   "08_transdecoder2",
+                                   "01_build_longread_transcriptome",
+                                   "13_transdecoder",
                                    "transcripts.fasta.TD2.cds"),
                         format = "fasta")
 
@@ -102,8 +102,8 @@ cds_best_coords <- cds_best %>%
 
 # Load AA sequences
 aa <- readAAStringSet(here::here("data",
-                                 "isoseq",
-                                 "08_transdecoder2",
+                                 "01_build_longread_transcriptome",
+                                 "13_transdecoder",
                                  "transcripts.fasta.TD2.pep"),
                       format = "fasta")
 
@@ -126,7 +126,7 @@ cds_best_coords <- cds_best_coords %>%
 # Save
 write.csv(cds_best_coords,
           here::here("data",
-                     "isoseq",
-                     "08_transdecoder2",
+                     "01_build_longread_transcriptome",
+                     "13_transdecoder",
                      "parsed_results.csv"), 
           row.names = FALSE)
