@@ -14,7 +14,7 @@
 #   bash 01_build_longread_transcriptome/02_isoseq_lima.sh
 #
 # Reads:  data/01_build_longread_transcriptome/01_skera/segmented_cellN.bam
-#         data/01_build_longread_transcriptome/reference/IsoSeq_v2_primers_12.fasta
+#         data/reference/IsoSeq_v2_primers_12.fasta
 # Writes: data/01_build_longread_transcriptome/02_lima/cellN/
 #           output.IsoSeqX_bcNN_5p--IsoSeqX_3p.bam   one BAM per barcode
 #           output.lima.*                            reports (unbarcoded reads are not kept)
@@ -30,7 +30,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/01_skera
 OUT=$DATA/02_lima
-PRIMERS=$DATA/reference/IsoSeq_v2_primers_12.fasta   # IsoSeqX bc01-12 5' primers + 3' primer
+PRIMERS=$ROOT/data/reference/IsoSeq_v2_primers_12.fasta   # IsoSeqX bc01-12 5' primers + 3' primer
 THREADS=24                                           # speed only, does not change results
 
 [[ -f "$PRIMERS" ]] || { echo "ERROR: primer file $PRIMERS not found" >&2; exit 1; }

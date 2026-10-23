@@ -15,7 +15,7 @@
 #   bash 01_build_longread_transcriptome/09_illumina_star.sh
 #
 # Reads:  data/01_build_longread_transcriptome/08_trimmomatic/<sample>_R{1,2}_paired.fastq.gz
-#         data/01_build_longread_transcriptome/reference/ncbi_female.fa
+#         data/reference/ncbi_female.fa
 # Writes: data/01_build_longread_transcriptome/09_star/
 #           STAR_index/                                 genome index
 #           STAR_mapping/<sample>Aligned.sortedByCoord.out.bam
@@ -31,7 +31,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/08_trimmomatic
-GENOME=$DATA/reference/ncbi_female.fa
+GENOME=$ROOT/data/reference/ncbi_female.fa
 OUT=$DATA/09_star
 INDEX=$OUT/STAR_index
 INDEX_THREADS=4     # speed only, does not change results

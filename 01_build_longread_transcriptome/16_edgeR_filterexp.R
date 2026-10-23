@@ -59,7 +59,6 @@ y <- catchKallisto(abundance_dirs)
 
 # Load gtf
 gtf <- import(here::here("data",
-                         "isoseq",
                          "GTF",
                          "03_nonredundant_transcriptome.gtf"))
 gtf_df <- as.data.frame(gtf)
@@ -460,7 +459,6 @@ write.csv(class,
 
 # # GTF output from redundancy script
 # gtf <- rtracklayer::import(here::here("data",
-#                                       "isoseq",
 #                                       "GTF",
 #                                       "03_nonredundant_transcriptome.gtf"))
 
@@ -471,7 +469,6 @@ gtf_filtered <- gtf[gtf$transcript_id %in% keep_transcripts_union]
 rtracklayer::export(
   gtf_filtered,
   here("data", 
-       "isoseq", 
        "GTF", 
        "04_filtered_by_exp_long.gtf"),
   format = "gtf"

@@ -8,9 +8,9 @@ mkdir -p ./08_transdecoder2
 export PATH=/Library/Frameworks/Python.framework/Versions/3.11/bin/TD2/util:$PATH
 
 # Convert transcriptome to fasta directly from genomic coordinates
-./TransDecoder-v5.7.1/util/gtf_genome_to_cdna_fasta.pl ./GTF/02_SQANTI_filtered.gtf ./guppy_genomes/ncbi_female.fa > ./08_transdecoder2/transcripts.fasta
+./TransDecoder-v5.7.1/util/gtf_genome_to_cdna_fasta.pl data/GTF/02_SQANTI_filtered.gtf data/reference/ncbi_female.fa > ./08_transdecoder2/transcripts.fasta
 # Convert gtf to gff3 
-./TransDecoder-v5.7.1/util/gtf_to_alignment_gff3.pl ./GTF/02_SQANTI_filtered.gtf > ./08_transdecoder2/transcripts.gff3
+./TransDecoder-v5.7.1/util/gtf_to_alignment_gff3.pl data/GTF/02_SQANTI_filtered.gtf > ./08_transdecoder2/transcripts.gff3
 
 # === Setup logging ===
 LOGFILE="./08_transdecoder2/transdecoder2_$(date +%Y%m%d_%H%M%S).log"

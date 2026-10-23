@@ -13,7 +13,7 @@
 #
 # Reads:  data/01_build_longread_transcriptome/00_hifireads/*.hifi_reads.bcM000N.bam
 #           (one per SMRT cell; bcM000N = cell/pool N)
-#         data/01_build_longread_transcriptome/reference/mas8_primers.fasta
+#         data/reference/mas8_primers.fasta
 # Writes: data/01_build_longread_transcriptome/01_skera/
 #           segmented_cellN.bam      S-reads, input to step 02
 #           segmented_cellN.*        skera's other outputs (non_passing, summary)
@@ -29,7 +29,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/00_hifireads
 OUT=$DATA/01_skera
-ADAPTERS=$DATA/reference/mas8_primers.fasta   # Kinnex full-length RNA, 8-mer arrays (MAS-Seq_Adapter_v3)
+ADAPTERS=$ROOT/data/reference/mas8_primers.fasta   # Kinnex full-length RNA, 8-mer arrays (MAS-Seq_Adapter_v3)
 THREADS=24                                    # speed only, does not change results
 
 [[ -f "$ADAPTERS" ]] || { echo "ERROR: adapter file $ADAPTERS not found" >&2; exit 1; }

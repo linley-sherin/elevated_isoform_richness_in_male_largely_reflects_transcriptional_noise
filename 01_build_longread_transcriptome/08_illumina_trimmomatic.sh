@@ -11,7 +11,7 @@
 # (MultiQC runs from its own env, multiqc_env)
 #
 # Reads:  data/01_build_longread_transcriptome/07_cutadapt/<sample>_R{1,2}.fastq.gz
-#         data/01_build_longread_transcriptome/reference/TruSeq3-PE-2.fa
+#         data/reference/TruSeq3-PE-2.fa
 # Writes: data/01_build_longread_transcriptome/08_trimmomatic/
 #           <sample>_R{1,2}_paired.fastq.gz   trimmed pairs, input to steps 09 and 10
 #           unpaired/                         reads whose mate was dropped
@@ -28,7 +28,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DATA=$ROOT/data/01_build_longread_transcriptome
 IN=$DATA/07_cutadapt
 OUT=$DATA/08_trimmomatic
-ADAPTERS=$DATA/reference/TruSeq3-PE-2.fa
+ADAPTERS=$ROOT/data/reference/TruSeq3-PE-2.fa
 TRIMMOMATIC=~/Documents/programs/Trimmomatic-0.39/trimmomatic-0.39.jar
 
 [[ -f "$ADAPTERS" ]] || { echo "ERROR: adapter file $ADAPTERS not found" >&2; exit 1; }

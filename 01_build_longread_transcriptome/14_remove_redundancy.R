@@ -37,7 +37,6 @@ library(tidyverse)
 
 # Read filtered gtf
 gtf_sqanti <- rtracklayer::import(here::here("data",
-                                             "isoseq",
                                              "GTF",
                                              "02_SQANTI_filtered.gtf"))
 
@@ -872,7 +871,6 @@ gtf_formatted <- data.frame(
 write.table(
   gtf_formatted,
   file = here::here("data",
-                    "isoseq",
                     "GTF",
                     "03_nonredundant_transcriptome.gtf"),
   sep = "\t",

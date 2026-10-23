@@ -20,7 +20,7 @@
 # Reads:  data/01_build_longread_transcriptome/06_mapcollapse/collapsed.gff, collapsed.flnc_count.txt
 #         data/01_build_longread_transcriptome/09_star/STAR_mapping/<sample>SJ.out.tab, <sample>Aligned.sortedByCoord.out.bam
 #         data/01_build_longread_transcriptome/10_kallisto/<sample>/abundance.tsv
-#         data/01_build_longread_transcriptome/reference/ncbi_female.fa, ncbi_female_sorted.gtf
+#         data/reference/ncbi_female.fa, ncbi_female_sorted.gtf
 # Writes: data/01_build_longread_transcriptome/11_sqanti_qc/
 #           kallisto_abund/<sample>.tsv   kallisto tables for SQANTI3
 #           STAR_bams.fofn                list of STAR BAMs for SQANTI3
@@ -39,8 +39,8 @@ ISOFORMS=$DATA/06_mapcollapse/collapsed.gff
 FL_COUNTS=$DATA/06_mapcollapse/collapsed.flnc_count.txt
 STAR_DIR=$DATA/09_star/STAR_mapping
 KALLISTO_DIR=$DATA/10_kallisto
-ANNOTATION=$DATA/reference/ncbi_female_sorted.gtf
-GENOME=$DATA/reference/ncbi_female.fa
+ANNOTATION=$ROOT/data/reference/ncbi_female_sorted.gtf
+GENOME=$ROOT/data/reference/ncbi_female.fa
 OUT=$DATA/11_sqanti_qc
 CPUS=48             # speed only, does not change results
 CHUNKS=12           # speed only, does not change results

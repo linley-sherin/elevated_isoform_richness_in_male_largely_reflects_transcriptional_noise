@@ -1,89 +1,125 @@
 #!/bin/bash
 
-####################################################################################
-### STEP 10B: REQUANTIFY WITH KALLISTO (LONG-READS)
-####################################################################################
+## Step 15: quantify long reads (FLNC) against the final non-redundant transcriptome
+## Last modified by Linley Sherin 2026-10-23
+#
+# Runs locally.
+# (1) t2g map (transcript -> gene) from the non-redundant transcript FASTA
+# (2) FLNC BAMs -> FASTQ (only for samples without a FASTQ yet)
+# (3) kb ref + kb count --long per sample (kb_python wrapper, so the short-read and
+#     long-read pipelines match as closely as possible). Needs the kallisto build for
+#     k-mer size 64 (kallisto_LongKmer_NoOpt-v0.51.1), in tools/kallisto/.
+# (4) Mapping rate per sample
+#
+# Usage (from the project folder):
+#   conda activate kallisto_env
+#   bash 01_build_longread_transcriptome/15_kallisto_long.sh
+#
+# Reads:  data/01_build_longread_transcriptome/12_sqanti_filter/nonredundant_transcripts.fasta (from step 14)
+#         data/01_build_longread_transcriptome/04_updatebam/flnc_<sample>.bam (or .fastq)
+#         data/01_build_longread_transcriptome/tools/kallisto/kallisto_mac-v0.51.1_kmer64
+# Writes: data/01_build_longread_transcriptome/04_updatebam/flnc_<sample>.fastq (if missing)
+#         data/01_build_longread_transcriptome/15_kallisto/
+#           t2g.txt, kallisto_index_long.idx
+#           kallisto_long/flnc_<sample>.fastq/   kb output per sample, input to step 16
+#           maprate_long.txt
+#
+# The t2g and index are skipped if they already exist, and a sample if its
+# run_info.json already exists. Delete them to redo.
 
-## HERE I USE THE KB_PYTHON WRAPPER INSTEAD TO MAKE
-## THE SHORT-READ AND LONG-READ PIPELINES MATCH AS CLOSELY AS POSSIBLE
+set -euo pipefail
 
-## NOTE, MUST SPECIFY THE CORRECT KALLISTO BUILD FOR 64 KMER SIZE
-## kallisto_LongKmer_NoOpt-v0.51.1.tar.gz
+# Paths are relative to the project root (one folder up from this script)
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+DATA=$ROOT/data/01_build_longread_transcriptome
+FASTA=$DATA/12_sqanti_filter/nonredundant_transcripts.fasta
+FLNC=$DATA/04_updatebam
+KALLISTO=$DATA/tools/kallisto/kallisto_mac-v0.51.1_kmer64
+OUT=$DATA/15_kallisto
+T2G=$OUT/t2g.txt
+INDEX=$OUT/kallisto_index_long.idx
+THREADS=40          # speed only, does not change results
 
-# Before running: make sure to run (these run automatically as part of STEP11a)
-# (1) interleaved_2_noninterleaved.sh on filter output
-# (2) t2g.sh on noninterleaved output
-# (3) convert all bam files to fastq files for kallisto input
+[[ -f "$FASTA" ]] || { echo "ERROR: $FASTA not found. Run step 14 first." >&2; exit 1; }
+[[ -x "$KALLISTO" ]] || { echo "ERROR: kallisto k64 build not found at $KALLISTO" >&2; exit 1; }
 
-#for bamfile in /Volumes/mankbank_new/linley/ch2_splicing_reticulata/data/reticulata_isoseq_nojuv/03_updatebam/*.bam; do
-#    # Define the output name by stripping .bam and adding .fastq.gz
-#    outname="${bamfile%.bam}.fastq.gz"
-#    
-#    echo "Converting $bamfile to $outname..."
-#    
-#    # Convert BAM to compressed FASTQ to save space
-#    samtools fastq "$bamfile" | gzip > "$outname"
-#done
+mkdir -p "$OUT/kallisto_long"
 
-#echo "Conversion complete!"
-
-# Define files
-interleaved_fasta="./07_SQANTIfilter/nonredundant_transcripts.fasta"
-t2g_file="./07_SQANTIfilter/t2g.txt"
-
-# Define the path to the Kallisto index
-kallisto_index="./09_kallisto/kallisto_index_long.idx"
-
-# Check if the Kallisto index exists
-if [ ! -f "$kallisto_index" ]; then
-    echo "Index not found. Creating Kallisto index..."
-    kb ref "$interleaved_fasta" \
-    	   -i "$kallisto_index" \
-    	   --make-unique \
-    	   --workflow=custom \
-    	   -k 63 \
-    	   --kallisto ./kallisto/kallisto_mac-v0.51.1_kmer64 \
-    	   --tmp ./tmp_long
+## (1) t2g map: gene name = transcript name without the version number (.1, .2, ...)
+if [[ -f "$T2G" ]]; then
+    echo "t2g.txt already exists, skipping"
 else
-    echo "Kallisto index already exists. Skipping index creation."
+    echo "Creating t2g map..."
+    grep '^>' "$FASTA" | sed 's/^>//' | awk '{ gene = $1; sub(/\.[0-9]+$/, "", gene); print $1 "\t" gene }' > "$T2G"
 fi
 
-# Read each sample name
-while IFS= read -r line; do
-    # Define the output directory for this sample
-    output_dir="./09_kallisto/kallisto_long/$line"
+## (2) FLNC BAMs -> FASTQ for kallisto
+shopt -s nullglob
+for bam in "$FLNC"/flnc_*.bam; do
+    fastq=${bam%.bam}.fastq
+    [[ -f "$fastq" ]] && continue
+    echo "Converting $(basename "$bam") to FASTQ..."
+    samtools fastq "$bam" > "$fastq"
+done
 
-    # Make sure the output directory exists
-    mkdir -p "$output_dir"
+fastqs=("$FLNC"/flnc_*.fastq)
+[[ ${#fastqs[@]} -gt 0 ]] || { echo "ERROR: no flnc_*.fastq files in $FLNC. Run step 04 first." >&2; exit 1; }
 
-    # Define the path to the fastq files
-    fastq_long="/Volumes/mankbank_new/linley/ch2_splicing_reticulata/data/reticulata_isoseq_nojuv/03_updatebam/${line}"
+## (3) kallisto index and quantification
+if [[ -f "$INDEX" ]]; then
+    echo "Kallisto index already exists, skipping index creation"
+else
+    echo "Creating kallisto index..."
+    kb ref "$FASTA" \
+        -i "$INDEX" \
+        --make-unique \
+        --workflow=custom \
+        -k 63 \
+        --kallisto "$KALLISTO" \
+        --tmp "$OUT/tmp_long"
+fi
 
-    # Check if the fastq files exist
-    if [ ! -f "$fastq_long" ]; then
-        echo "Error: Fastq file for $line not found. Skipping this sample."
+for fastq in "${fastqs[@]}"; do
+    sample_out=$OUT/kallisto_long/$(basename "$fastq")
+
+    if [[ -f "$sample_out/run_info.json" ]]; then
+        echo "$(basename "$fastq") already done, skipping"
         continue
     fi
 
-    # Perform Kallisto quantification
-    # For long-reads we will computer 100 bootstraps in order to calculate uncertainty later
-    echo "Running Kallisto quantification for $line..."
+    # 100 bootstraps so uncertainty can be calculated later
+    echo "Running kallisto quantification for $(basename "$fastq")..."
+    mkdir -p "$sample_out"
     kb count -x bulk \
-             -i "$kallisto_index" \
-             -o "$output_dir" \
-             -g "$t2g_file" \
-             --parity=single \
-             --strand=unstranded \
-             --tcc \
-             --matrix-to-directories \
-             --long \
-             --platform PacBio \
-             "$fastq_long" \
-             --kallisto ./kallisto/kallisto_mac-v0.51.1_kmer64 \
-             --bootstraps 100 \
-             -t 40 \
-             --tmp ./tmp_long
+        -i "$INDEX" \
+        -o "$sample_out" \
+        -g "$T2G" \
+        --parity=single \
+        --strand=unstranded \
+        --tcc \
+        --matrix-to-directories \
+        --long \
+        --platform PacBio \
+        "$fastq" \
+        --kallisto "$KALLISTO" \
+        --bootstraps 100 \
+        -t "$THREADS" \
+        --tmp "$OUT/tmp_long"
+done
 
-#done < ./03_updatebam/flnc_fastq.fofn
-done < /Volumes/mankbank_new/linley/ch2_splicing_reticulata/data/reticulata_isoseq_nojuv/03_updatebam/flnc.fofn
+## (4) Mapping rate per sample
+echo "Finding mapping rate for long reads..."
+: > "$OUT/maprate_long.txt"
+for run_info in "$OUT"/kallisto_long/flnc_*/run_info.json; do
+    sample=$(basename "$(dirname "$run_info")")
+    sample=${sample#flnc_}
+    sample=${sample%.fastq}
+    processed_reads=$(jq -r '.n_processed' "$run_info")
+    mapped_reads=$(jq -r '.n_pseudoaligned' "$run_info")
+    pseudoaligned=$(jq -r '.p_pseudoaligned' "$run_info")
+    echo "$sample processed_reads: $processed_reads mapped_reads: $mapped_reads p_pseudoaligned: $pseudoaligned" >> "$OUT/maprate_long.txt"
+done
+echo "Mapping rates saved in $OUT/maprate_long.txt"
 
+echo "Kallisto is finished :)"
+date
