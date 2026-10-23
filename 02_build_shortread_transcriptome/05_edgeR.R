@@ -4,17 +4,11 @@
 # Load data
 # Use edgeR to load counts, scale and filter
 
-library(stringr)
 library(tidyr)
 library(ggplot2)
 library(dplyr)
-library(scales)
 library(edgeR)
-library(limma)
-library(sf)
 library(rtracklayer)
-library(here)
-library(ggpointdensity)
 
 ################################################################################
 ################################################################################
@@ -661,7 +655,7 @@ cat("Transcripts:", length(unique(gtf_filtered$transcript_id)), "\n")
 # Export as valid GTF (will automatically use the proper 9-column format)
 rtracklayer::export(
   gtf_filtered,
-  here("data", 
+  here::here("data", 
        "GTF", 
        "06_shortreadpipe_filtered_by_exp_short.gtf"),
   format = "gtf"

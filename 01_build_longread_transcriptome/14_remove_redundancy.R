@@ -20,16 +20,11 @@
 library(data.table)
 library(dplyr)
 library(tidyr)
+library(readr)
 library(rtracklayer)
-library(GenomicRanges)
 library(stringr)
-library(igraph)
-library(parallel)
-library(ggplot2)
-library(here)
 library(Biostrings)
 library(purrr)
-library(tidyverse)
 
 ################################################################################
 ### (1) Load

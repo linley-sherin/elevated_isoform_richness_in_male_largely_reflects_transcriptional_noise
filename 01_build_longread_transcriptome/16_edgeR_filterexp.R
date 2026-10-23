@@ -9,17 +9,11 @@
 # (4) Save filtered DGE objects for DE
 # (5) Filter over files by filter outputs
 
-library(stringr)
 library(tidyr)
 library(ggplot2)
 library(dplyr)
-library(scales)
 library(edgeR)
-library(limma)
-library(sf)
 library(rtracklayer)
-library(here)
-library(ggpointdensity)
 
 ################################################################################
 ################################################################################
@@ -469,7 +463,7 @@ gtf_filtered <- gtf[gtf$transcript_id %in% keep_transcripts_union]
 # Export as valid GTF (will automatically use the proper 9-column format)
 rtracklayer::export(
   gtf_filtered,
-  here("data", 
+  here::here("data", 
        "GTF", 
        "04_filtered_by_exp_long.gtf"),
   format = "gtf"

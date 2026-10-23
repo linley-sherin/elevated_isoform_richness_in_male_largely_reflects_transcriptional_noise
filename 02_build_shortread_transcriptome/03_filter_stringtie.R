@@ -8,8 +8,6 @@
 ### FILTER NOTICE: collapse isoforms the share all internal junctions
 
 library(rtracklayer)
-library(purrr)
-library(GenomicRanges)
 library(dplyr)
 library(stringr)
 
