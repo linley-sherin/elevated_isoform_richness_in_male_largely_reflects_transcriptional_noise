@@ -8,9 +8,9 @@ mkdir -p ./08_transdecoder2
 export PATH=/Library/Frameworks/Python.framework/Versions/3.11/bin/TD2/util:$PATH
 
 # Convert transcriptome to fasta directly from genomic coordinates
-./TransDecoder-v5.7.1/util/gtf_genome_to_cdna_fasta.pl data/GTF/02_SQANTI_filtered.gtf data/reference/ncbi_female.fa > ./08_transdecoder2/transcripts.fasta
+tools/TransDecoder-v5.7.1/util/gtf_genome_to_cdna_fasta.pl data/GTF/02_SQANTI_filtered.gtf data/reference/ncbi_female.fa > ./08_transdecoder2/transcripts.fasta
 # Convert gtf to gff3 
-./TransDecoder-v5.7.1/util/gtf_to_alignment_gff3.pl data/GTF/02_SQANTI_filtered.gtf > ./08_transdecoder2/transcripts.gff3
+tools/TransDecoder-v5.7.1/util/gtf_to_alignment_gff3.pl data/GTF/02_SQANTI_filtered.gtf > ./08_transdecoder2/transcripts.gff3
 
 # === Setup logging ===
 LOGFILE="./08_transdecoder2/transdecoder2_$(date +%Y%m%d_%H%M%S).log"
@@ -57,7 +57,7 @@ rmdir "$BASENAME"
 # === Use TD2 utility scripts to try and fix issue with strand mismatches  === #
 # Create gff3 output with cds regions already annotated
 
-../TransDecoder-v5.7.1/util/cdna_alignment_orf_to_genome_orf.pl \
+tools/TransDecoder-v5.7.1/util/cdna_alignment_orf_to_genome_orf.pl \
      ../08_transdecoder2/transcripts.fasta.TD2.gff3 \
      ../08_transdecoder2/transcripts.gff3 \
      ../08_transdecoder2/transcripts.fasta > transcripts_with_cds.gff3

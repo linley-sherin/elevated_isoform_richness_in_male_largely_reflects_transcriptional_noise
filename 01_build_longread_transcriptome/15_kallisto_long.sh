@@ -8,7 +8,7 @@
 # (2) FLNC BAMs -> FASTQ (only for samples without a FASTQ yet)
 # (3) kb ref + kb count --long per sample (kb_python wrapper, so the short-read and
 #     long-read pipelines match as closely as possible). Needs the kallisto build for
-#     k-mer size 64 (kallisto_LongKmer_NoOpt-v0.51.1), in tools/kallisto/.
+#     k-mer size 64 (kallisto_LongKmer_NoOpt-v0.51.1), in tools/kallisto/ (project folder).
 # (4) Mapping rate per sample
 #
 # Usage (from the project folder):
@@ -17,7 +17,7 @@
 #
 # Reads:  data/01_build_longread_transcriptome/12_sqanti_filter/nonredundant_transcripts.fasta (from step 14)
 #         data/01_build_longread_transcriptome/04_updatebam/flnc_<sample>.bam (or .fastq)
-#         data/01_build_longread_transcriptome/tools/kallisto/kallisto_mac-v0.51.1_kmer64
+#         tools/kallisto/kallisto_mac-v0.51.1_kmer64
 # Writes: data/01_build_longread_transcriptome/04_updatebam/flnc_<sample>.fastq (if missing)
 #         data/01_build_longread_transcriptome/15_kallisto/
 #           t2g.txt, kallisto_index_long.idx
@@ -34,7 +34,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DATA=$ROOT/data/01_build_longread_transcriptome
 FASTA=$DATA/12_sqanti_filter/nonredundant_transcripts.fasta
 FLNC=$DATA/04_updatebam
-KALLISTO=$DATA/tools/kallisto/kallisto_mac-v0.51.1_kmer64
+KALLISTO=$ROOT/tools/kallisto/kallisto_mac-v0.51.1_kmer64
 OUT=$DATA/15_kallisto
 T2G=$OUT/t2g.txt
 INDEX=$OUT/kallisto_index_long.idx
